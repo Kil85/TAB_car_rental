@@ -47,13 +47,11 @@ namespace Car_Rential.Controllers
         }
 
         [HttpPost("add")]
-        public ActionResult AddCar([FromForm] string stringCarDto, [FromForm] IFormFile file)
+        public ActionResult AddCar([FromBody] InputCarDto carDto)
         {
-            var carDto = JsonConvert.DeserializeObject<InputCarDto>(stringCarDto);
-
             _registerCarValidator.ValidateAndThrow(carDto);
 
-            var result = _carsService.AddCar(carDto, file);
+            var result = _carsService.AddCar(carDto);
             return Created($"/api/car/{result}", null);
         }
 

@@ -111,7 +111,11 @@ builder.Services.AddCors(options =>
         "Front",
         builder =>
         {
-            builder.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader();
+            builder
+                .AllowAnyMethod()
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .WithExposedHeaders("Location");
         }
     );
 });

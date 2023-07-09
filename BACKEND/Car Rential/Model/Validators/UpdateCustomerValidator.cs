@@ -1,6 +1,7 @@
 ﻿using Car_Rential.Entieties;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Car_Rential.Model.Validators
 {
@@ -9,12 +10,12 @@ namespace Car_Rential.Model.Validators
         public UpdateCustomerValidator(RentalDbContext dbContext)
         {
             RuleFor(c => c.FirstName)
-                .Matches("^[a-zA-Z]+$")
+                .Matches(@"^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]+$")
                 .WithMessage("FirstName must not contain white spaces")
                 .MaximumLength(30);
 
             RuleFor(c => c.LastName)
-                .Matches("^[a-zA-Z]+$")
+                .Matches(@"^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]+$")
                 .WithMessage("LastName must not contain white spaces")
                 .MaximumLength(30);
 
@@ -23,10 +24,18 @@ namespace Car_Rential.Model.Validators
                 .Custom(
                     (value, contex) =>
                     {
-                        var result = dbContext.Custormers.Any(c => c.PhoneNumber == value);
-                        if (result)
+                        var result = dbContext.Custormers
+                            .Where(c => c.PhoneNumber == value)
+                            .ToList();
+
+                        var id = contex.InstanceToValidate.Identyfire;
+                        if (!result.IsNullOrEmpty())
                         {
-                            contex.AddFailure("PhoneNumber", "PhoneNumber must be uniqe");
+                            foreach (var item in result)
+                            {
+                                if (item.Id != id)
+                                    contex.AddFailure("PhoneNumber", "PhoneNumber must be uniqe");
+                            }
                         }
                     }
                 );
@@ -38,10 +47,15 @@ namespace Car_Rential.Model.Validators
                 .Custom(
                     (value, contex) =>
                     {
-                        var result = dbContext.Custormers.Any(c => c.Email == value);
-                        if (result)
+                        var result = dbContext.Custormers.Where(c => c.Email == value).ToList();
+                        var id = contex.InstanceToValidate.Identyfire;
+                        if (!result.IsNullOrEmpty())
                         {
-                            contex.AddFailure("Email", "Email must be uniqe");
+                            foreach (var item in result)
+                            {
+                                if (item.Id != id)
+                                    contex.AddFailure("Email", "Email must be uniqe");
+                            }
                         }
                     }
                 );
@@ -52,16 +66,23 @@ namespace Car_Rential.Model.Validators
                 .Custom(
                     (value, contex) =>
                     {
-                        var result = dbContext.Custormers.Any(c => c.Pesel == value);
-                        if (result)
+                        var result = dbContext.Custormers.Where(c => c.Pesel == value).ToList();
+                        var id = contex.InstanceToValidate.Identyfire;
+                        if (!result.IsNullOrEmpty())
                         {
-                            contex.AddFailure("Pesel", "Pesel must be uniqe");
+                            foreach (var item in result)
+                            {
+                                if (item.Id != id)
+                                    contex.AddFailure("Pesel", "Pesel must be uniqe");
+                            }
                         }
                     }
                 );
 
             RuleFor(c => c.Password)
-                .Matches(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")
+                .Matches(
+                    @"^(null|(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,})$"
+                )
                 .WithMessage(
                     "Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character [@$!%*?&], and be at least 8 characters long."
                 );
@@ -76,7 +97,7 @@ namespace Car_Rential.Model.Validators
                 .WithMessage("Building number can only contain digits and one optional letter");
 
             RuleFor(a => a.ZipCode)
-                .Matches(@"^(\d{5})$")
+                .Matches(@"^\d{5}$|^\d{2}-\d{3}$")
                 .WithMessage("ZipCode if format XXXXX where X is a digit");
 
             RuleFor(a => a.State).MaximumLength(255);

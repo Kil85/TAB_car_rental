@@ -41,7 +41,7 @@ namespace Car_Rential.Services
             return result;
         }
 
-        public int AddCar(InputCarDto carDto, IFormFile file)
+        public int AddCar(InputCarDto carDto)
         {
             var car = _mapper.Map<Car>(carDto);
 

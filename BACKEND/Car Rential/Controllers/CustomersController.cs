@@ -86,6 +86,8 @@ namespace Car_Rential.Controllers
             [FromRoute] int customerId
         )
         {
+            customerDto.Identyfire = customerId;
+
             _UpdateValidator.ValidateAndThrow(customerDto);
 
             _customersService.UpdateCustomer(customerDto, customerId);
