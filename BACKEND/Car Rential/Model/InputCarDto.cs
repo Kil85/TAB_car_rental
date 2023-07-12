@@ -4,6 +4,7 @@ namespace Car_Rential.Model
 {
     public class InputCarDto
     {
+        public int Identyfire { get; set; }
         public string? Type { get; set; }
         public string Model { get; set; }
         public string Brand { get; set; }

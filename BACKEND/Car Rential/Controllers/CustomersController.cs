@@ -87,8 +87,14 @@ namespace Car_Rential.Controllers
         )
         {
             customerDto.Identyfire = customerId;
+            var validationResult = _UpdateValidator.Validate(customerDto);
 
-            _UpdateValidator.ValidateAndThrow(customerDto);
+            if (!validationResult.IsValid)
+            {
+                string[] errors = validationResult.FormatValidationErrors();
+
+                return BadRequest(errors);
+            }
 
             _customersService.UpdateCustomer(customerDto, customerId);
 

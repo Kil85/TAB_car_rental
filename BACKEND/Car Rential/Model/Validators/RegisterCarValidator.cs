@@ -40,9 +40,9 @@ namespace Car_Rential.Model.Validators
             RuleFor(c => c.Type).NotEmpty();
 
             RuleFor(c => c.RegistrationNumber)
-                .Matches(@"^[A-Z]{2,3}\s{0,1}[0-9A-Z]{4}$")
+                .Matches(@"^[A-Z0-9]{7}$")
                 .WithMessage(
-                    "Invalid license plate number format. Please enter a valid license plate number in the format: ABC 1234 or AB 1234 or ABC1234 or ABC 1234."
+                    "Invalid license plate number format. Please enter a valid license plate number in the format: 7 characters capital letters or numbers."
                 )
                 .NotEmpty()
                 .Custom(

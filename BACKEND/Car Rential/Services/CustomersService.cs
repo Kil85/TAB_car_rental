@@ -253,17 +253,17 @@ namespace Car_Rential.Services
         {
             var query = _dbContext.Custormers.Where(c => c.Id == customerId);
 
-            if (query.IsNullOrEmpty())
-            {
-                throw new CustomerNotFoundException("Account doesn't exist");
-            }
-
             foreach (var expression in expressions)
             {
-                query.Include(expression);
+                query = query.Include(expression);
             }
 
             var result = query.FirstOrDefault();
+
+            if (result == null)
+            {
+                throw new CustomerNotFoundException("Account doesn't exist");
+            }
 
             return result;
         }

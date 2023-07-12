@@ -49,7 +49,14 @@ namespace Car_Rential.Controllers
         [HttpPost("add")]
         public ActionResult AddCar([FromBody] InputCarDto carDto)
         {
-            _registerCarValidator.ValidateAndThrow(carDto);
+            var validationResult = _registerCarValidator.Validate(carDto);
+
+            if (!validationResult.IsValid)
+            {
+                string[] errors = validationResult.FormatValidationErrors();
+
+                return BadRequest(errors);
+            }
 
             var result = _carsService.AddCar(carDto);
             return Created($"/api/car/{result}", null);
@@ -66,7 +73,16 @@ namespace Car_Rential.Controllers
         [HttpPatch("{carId}")]
         public ActionResult UpdateCar([FromRoute] int carId, [FromBody] InputCarDto carDto)
         {
-            _updateCarValidator.ValidateAndThrow(carDto);
+            carDto.Identyfire = carId;
+
+            var validationResult = _updateCarValidator.Validate(carDto);
+
+            if (!validationResult.IsValid)
+            {
+                string[] errors = validationResult.FormatValidationErrors();
+
+                return BadRequest(errors);
+            }
 
             _carsService.UpdateCar(carDto, carId);
             return Ok();

@@ -54,7 +54,7 @@ namespace Car_Rential.Middleware
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Sth went wrong :<");
+                await context.Response.WriteAsync(ex.Message);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Car_Rential.Entieties;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Car_Rential.Model.Validators
 {
@@ -34,20 +35,27 @@ namespace Car_Rential.Model.Validators
             RuleFor(c => c.FuelType).Matches(@"^[a-zA-Z]{1,50}$").WithMessage(errorMessage);
 
             RuleFor(c => c.RegistrationNumber)
-                .Matches(@"^[A-Z]{2,3}\s{0,1}[0-9A-Z]{4}$")
+                .Matches(@"^[A-Z0-9]{7}$")
                 .WithMessage(
-                    "Invalid license plate number format. Please enter a valid license plate number in the format: ABC 1234 or AB 1234 or ABC1234 or ABC 1234."
+                    "Invalid license plate number format. Please enter a valid license plate number in the format: 7 characters capital letters or numbers."
                 )
                 .Custom(
                     (value, context) =>
                     {
-                        var isUsed = _dbContext.Cars.Any(y => y.RegistrationNumber == value);
-                        if (isUsed)
+                        var isUsed = _dbContext.Cars
+                            .Where(y => y.RegistrationNumber == value)
+                            .ToList();
+                        if (!isUsed.IsNullOrEmpty())
                         {
-                            context.AddFailure(
-                                "RegistrationNumber",
-                                "Registration Number must be unique"
-                            );
+                            var id = context.InstanceToValidate.Identyfire;
+                            foreach (var item in isUsed)
+                            {
+                                if (item.Id != id)
+                                    context.AddFailure(
+                                        "RegistrationNumber",
+                                        "Registration Number must be unique"
+                                    );
+                            }
                         }
                     }
                 );
